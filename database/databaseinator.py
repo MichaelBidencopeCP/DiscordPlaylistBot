@@ -16,7 +16,7 @@ class Database_controlinator():
             return False
     
     def add_song_skip(self, song_id:int):
-        res = self.c.execute("UPDATE songs SET skips = skips + 1 WHERE song_id = ?", (song_id,))
+        res = self.c.execute("UPDATE songs SET skips = skips + 1 WHERE rowid = ?", (song_id,))
         self.conn.commit()
         if res.rowcount == 1:
             return True
@@ -24,16 +24,18 @@ class Database_controlinator():
             return False
     
     def get_song_by_id(self, song_id:int):
-        res = self.c.execute("SELECT * FROM songs WHERE song_id = ?", (song_id,))
+        res = self.c.execute("SELECT * FROM songs WHERE rowid = ?", (song_id,))
         return res.fetchone()
     
     def check_if_song_link_exists(self, song_link:str):
-        res = self.c.execute("SELECT * FROM songs WHERE song_link = ?", (song_link,))
-        return res.fetchone()
+        res = self.c.execute("SELECT rowid FROM songs WHERE song_link = ?", (song_link,))
+        if res.rowcount == 0:
+            return False
+        else:
+            return res.fetchone()[0]
     
     def get_all_songs(self):
         res = self.c.execute("SELECT * FROM songs")
         return res.fetchall()
     
-test = Database_controlinator()
-print(test.get_all_songs())
+
